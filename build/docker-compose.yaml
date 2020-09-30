@@ -1,0 +1,16 @@
+# Build (Linux)
+
+version: "3"
+services:
+
+  dotnetcore_signalr:
+    image: "rogersantos/dotnetcore_signalr:linux"
+    build:
+      context: ../
+      dockerfile: ./build/build_linux.docker
+    stdin_open: true
+    tty: true
+    # entrypoint: /bin/bash
+    ports:
+      - "8000:8000"
+

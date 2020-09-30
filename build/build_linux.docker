@@ -1,0 +1,27 @@
+# Build Linux
+
+## Build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+WORKDIR /workspace
+
+### Compile Project
+COPY ./DotNetCore.SignalR.sln /workspace/DotNetCore.SignalR.sln
+COPY ./src /workspace/src
+RUN echo "*** Compile Project" \
+  && cd /workspace \
+  && dotnet restore \
+  && dotnet publish -c Release -o /workspace/stage/release \
+  && echo "*** Compile Project - DONE" 
+
+## Release
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-bionic AS release
+WORKDIR /app
+
+### Install Release 
+COPY --from=build /workspace/stage/release /app
+ENTRYPOINT ["dotnet", "DotNetCore.SignalR.Server.dll"]
+ENV ASPNETCORE_URLS=http://+:8000
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+ENV NUGET_XMLDOC_MODE=skip
+EXPOSE 8000
+
